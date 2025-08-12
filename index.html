@@ -328,135 +328,246 @@
             console.error("Firebase initialization failed:", error);
         }
 
-
-function enableLiveSync() {
-    const ref = firebase.database().ref("gameState");
-    ref.on("value", snapshot => {
-        const fetchedState = snapshot.val();
-        if (fetchedState) {
-            if (JSON.stringify(fetchedState) !== JSON.stringify(gameState)) {
-                gameState = fetchedState;
-                console.log("-----------------------------------------");
-                console.log("Live data received and scoreboard updated.");
-                console.log("Current gameState:", gameState);
-                console.log("-----------------------------------------");
-                updateAllDisplay();
-            }
-        } else {
-            console.log("No live data found in Firebase. Scoreboard is blank.");
-            resetDisplay();
+        function enableLiveSync() {
+            const ref = firebase.database().ref("gameState");
+            ref.on("value", snapshot => {
+                const fetchedState = snapshot.val();
+                if (fetchedState) {
+                    if (JSON.stringify(fetchedState) !== JSON.stringify(gameState)) {
+                        gameState = fetchedState;
+                        updateAllDisplay();
+                        console.log("Live data received and scoreboard updated.");
+                    }
+                } else {
+                    console.log("No live data found in Firebase. Scoreboard is blank.");
+                    resetDisplay();
+                }
+            }, errorObject => {
+                console.error("The read failed: " + errorObject.name);
+                alert("Failed to connect to the live scoreboard. Please check your internet connection.");
+            });
         }
-    }, errorObject => {
-        console.error("The read failed: " + errorObject.name);
-        alert("Failed to connect to the live scoreboard. Please check your internet connection.");
-    });
-}
+    
+        function resetDisplay() {
+            document.getElementById('teamA-name').textContent = 'Team A';
+            document.getElementById('teamA-score').textContent = '0/0';
+            document.getElementById('teamA-overs').textContent = 'Overs: 0.0';
+            document.getElementById('teamB-name').textContent = 'Team B';
+            document.getElementById('teamB-score').textContent = '0/0';
+            document.getElementById('teamB-overs').textContent = 'Overs: 0.0';
+            document.getElementById('last-wicket-info').textContent = 'N/A';
+            document.getElementById('bowler-name').textContent = 'N/A';
+            document.getElementById('this-over-runs').textContent = '0';
+            document.getElementById('last-over-display').textContent = 'N/A';
+            document.getElementById('current-over-number').textContent = '1';
+            const ballsContainer = document.getElementById('current-over-balls');
+            ballsContainer.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const pendingBallDiv = document.createElement('div');
+                pendingBallDiv.className = 'ball pending';
+                ballsContainer.appendChild(pendingBallDiv);
+            }
+            document.getElementById('target-info').style.display = 'none';
+        }
 
-function resetDisplay() {
-    console.log("resetDisplay() function called. Resetting all display elements.");
-    // ... (rest of your resetDisplay code)
-}
+        function updateAllDisplay() {
+            const teamA = gameState.teams.A;
+            const teamB = gameState.teams.B;
+            const battingTeamKey = gameState.battingTeam;
+            const bowlingTeamKey = gameState.bowlingTeam;
+            const battingTeam = gameState.teams[battingTeamKey];
+            const bowlingTeam = gameState.teams[bowlingTeamKey];
+            
+            document.getElementById('teamA-name').textContent = teamA.name;
+            document.getElementById('teamA-score').textContent = `${teamA.score}/${teamA.wickets}`;
+            document.getElementById('teamA-overs').textContent = `Overs: ${teamA.overs}.${teamA.balls}`;
+            const teamA_rr = (teamA.score / ((teamA.overs * 6 + teamA.balls) / 6) || 0).toFixed(2);
+            document.getElementById('teamA-rr').textContent = isFinite(teamA_rr) ? teamA_rr : '0.00';
+            
+            document.getElementById('teamB-name').textContent = teamB.name;
+            document.getElementById('teamB-score').textContent = `${teamB.score}/${teamB.wickets}`;
+            document.getElementById('teamB-overs').textContent = `Overs: ${teamB.overs}.${teamB.balls}`;
+            const teamB_rr = (teamB.score / ((teamB.overs * 6 + teamB.balls) / 6) || 0).toFixed(2);
+            document.getElementById('teamB-rr').textContent = isFinite(teamB_rr) ? teamB_rr : '0.00';
 
-function updateAllDisplay() {
-    console.log("updateAllDisplay() function called. Starting updates for all components.");
-    const teamA = gameState.teams.A;
-    const teamB = gameState.teams.B;
-    const battingTeamKey = gameState.battingTeam;
-    const bowlingTeamKey = gameState.bowlingTeam;
-    const battingTeam = gameState.teams[battingTeamKey];
+            if (battingTeam) {
+                document.getElementById(`${battingTeamKey}-name`).textContent = `* ${battingTeam.name}`;
+            }
 
-    // ... (your existing update code for team scores)
+            updateBatsmanStats();
+            updateLastWicketDisplay();
+            updateBowlerStats();
+            updateCurrentOverDisplay();
+            updateLastOverDisplay();
+            updateTargetDisplay();
+        }
 
-    // Call individual update functions with logging
-    updateBatsmanStats();
-    updateLastWicketDisplay();
-    updateBowlerStats();
-    updateCurrentOverDisplay();
-    updateLastOverDisplay();
-    updateTargetDisplay();
-}
+        function updateBatsmanStats() {
+            const battingTeam = gameState.teams[gameState.battingTeam];
+            const batsman1 = gameState.currentBatsmen[1];
+            const batsman2 = gameState.currentBatsmen[2];
 
-function updateBatsmanStats() {
-    console.log("--- updateBatsmanStats() called. ---");
-    const battingTeam = gameState.teams[gameState.battingTeam];
-    const batsman1 = gameState.currentBatsmen ? gameState.currentBatsmen[1] : null;
-    const batsman2 = gameState.currentBatsmen ? gameState.currentBatsmen[2] : null;
-    console.log("Batsman 1 ID:", batsman1, " | Batsman 2 ID:", batsman2);
+            if (batsman1 && battingTeam.playerStats[batsman1]) {
+                const stats1 = battingTeam.playerStats[batsman1];
+                document.getElementById('batsman1-name').textContent = `${stats1.name}*`;
+                document.getElementById('batsman1-runs').textContent = stats1.runs;
+                document.getElementById('batsman1-balls').textContent = stats1.balls;
+                const sr1 = (stats1.runs / stats1.balls * 100) || 0;
+                document.getElementById('batsman1-sr').textContent = isFinite(sr1) ? sr1.toFixed(2) : '0.00';
+            } else {
+                document.getElementById('batsman1-name').textContent = 'Batsman 1';
+                document.getElementById('batsman1-runs').textContent = '0';
+                document.getElementById('batsman1-balls').textContent = '0';
+                document.getElementById('batsman1-sr').textContent = '0.00';
+            }
 
-    if (batsman1 && battingTeam && battingTeam.playerStats && battingTeam.playerStats[batsman1]) {
-        const stats1 = battingTeam.playerStats[batsman1];
-        console.log("Found stats for Batsman 1:", stats1);
-        document.getElementById('batsman1-name').textContent = `${stats1.name}*`;
-        document.getElementById('batsman1-runs').textContent = stats1.runs;
-        document.getElementById('batsman1-balls').textContent = stats1.balls;
-        const sr1 = (stats1.runs / stats1.balls * 100) || 0;
-        document.getElementById('batsman1-sr').textContent = isFinite(sr1) ? sr1.toFixed(2) : '0.00';
-    } else {
-        console.log("Batsman 1 data not found. Using default values.");
-        document.getElementById('batsman1-name').textContent = 'Batsman 1';
-        document.getElementById('batsman1-runs').textContent = '0';
-        document.getElementById('batsman1-balls').textContent = '0';
-        document.getElementById('batsman1-sr').textContent = '0.00';
-    }
-
-    if (batsman2 && battingTeam && battingTeam.playerStats && battingTeam.playerStats[batsman2]) {
-        const stats2 = battingTeam.playerStats[batsman2];
-        console.log("Found stats for Batsman 2:", stats2);
-        document.getElementById('batsman2-name').textContent = `${stats2.name}`;
-        document.getElementById('batsman2-runs').textContent = stats2.runs;
-        document.getElementById('batsman2-balls').textContent = stats2.balls;
-        const sr2 = (stats2.runs / stats2.balls * 100) || 0;
-        document.getElementById('batsman2-sr').textContent = isFinite(sr2) ? sr2.toFixed(2) : '0.00';
-    } else {
-        console.log("Batsman 2 data not found. Using default values.");
-        document.getElementById('batsman2-name').textContent = 'Batsman 2';
-        document.getElementById('batsman2-runs').textContent = '0';
-        document.getElementById('batsman2-balls').textContent = '0';
-        document.getElementById('batsman2-sr').textContent = '0.00';
-    }
-}
+            if (batsman2 && battingTeam.playerStats[batsman2]) {
+                const stats2 = battingTeam.playerStats[batsman2];
+                document.getElementById('batsman2-name').textContent = `${stats2.name}`;
+                document.getElementById('batsman2-runs').textContent = stats2.runs;
+                document.getElementById('batsman2-balls').textContent = stats2.balls;
+                const sr2 = (stats2.runs / stats2.balls * 100) || 0;
+                document.getElementById('batsman2-sr').textContent = isFinite(sr2) ? sr2.toFixed(2) : '0.00';
+            } else {
+                document.getElementById('batsman2-name').textContent = 'Batsman 2';
+                document.getElementById('batsman2-runs').textContent = '0';
+                document.getElementById('batsman2-balls').textContent = '0';
+                document.getElementById('batsman2-sr').textContent = '0.00';
+            }
+        }
         
-function updateLastWicketDisplay() {
-    console.log("--- updateLastWicketDisplay() called. ---");
-    const lw = gameState.lastWicket;
-    const infoEl = document.getElementById('last-wicket-info');
-    console.log("Last Wicket data:", lw);
-    if (infoEl) infoEl.textContent = lw ? `${lw.name} ${lw.runs} (${lw.balls})` : 'N/A';
-}
+        function updateLastWicketDisplay() {
+            const lw = gameState.lastWicket;
+            const infoEl = document.getElementById('last-wicket-info');
+            if (infoEl) infoEl.textContent = lw ? `${lw.name} ${lw.runs} (${lw.balls})` : 'N/A';
+        }
 
-function updateBowlerStats() {
-    console.log("--- updateBowlerStats() called. ---");
-    const bowlingTeam = gameState.teams[gameState.bowlingTeam];
-    console.log("Current Bowler ID:", gameState.currentBowler);
+        function updateBowlerStats() {
+            const bowlingTeam = gameState.teams[gameState.bowlingTeam];
+            const bowlerNameEl = document.getElementById('bowler-name');
+            const bowlerOversEl = document.getElementById('bowler-overs');
+            const bowlerFiguresEl = document.getElementById('bowler-wickets');
+            const bowlerMaidensEl = document.getElementById('bowler-maidens');
+            const bowlerEconomyEl = document.getElementById('bowler-economy');
 
-    if (gameState.currentBowler && bowlingTeam && bowlingTeam.playerStats && bowlingTeam.playerStats[gameState.currentBowler]) {
-        const bowlerStats = bowlingTeam.playerStats[gameState.currentBowler];
-        console.log("Found stats for bowler:", bowlerStats);
-        // ... (rest of your bowler stat update code)
-    } else {
-        console.log("Bowler data not found. Using default values.");
-        // ... (rest of your bowler stat default code)
-    }
-}
+            if (gameState.currentBowler && bowlingTeam.playerStats[gameState.currentBowler]) {
+                const bowlerStats = bowlingTeam.playerStats[gameState.currentBowler];
+                const overs = bowlerStats.overs + Math.floor(bowlerStats.balls / 6);
+                const balls = bowlerStats.balls % 6;
+                const economy = (bowlerStats.runs / (bowlerStats.overs * 6 + bowlerStats.balls) * 6) || 0;
+                
+                bowlerNameEl.textContent = bowlerStats.name;
+                bowlerOversEl.textContent = `${overs}.${balls}`;
+                bowlerFiguresEl.textContent = `${bowlerStats.wickets}/${bowlerStats.runs}`;
+                bowlerMaidensEl.textContent = bowlerStats.maidens;
+                bowlerEconomyEl.textContent = isFinite(economy) ? economy.toFixed(2) : '0.00';
+            } else {
+                bowlerNameEl.textContent = 'N/A';
+                bowlerOversEl.textContent = '0.0';
+                bowlerFiguresEl.textContent = '0/0';
+                bowlerMaidensEl.textContent = '0';
+                bowlerEconomyEl.textContent = '0.00';
+            }
+        }
 
-function updateCurrentOverDisplay() {
-    console.log("--- updateCurrentOverDisplay() called. ---");
-    console.log("Current over data:", gameState.currentOver);
-    // ... (rest of your current over display code)
-}
+        function updateCurrentOverDisplay() {
+            const container = document.getElementById('current-over-balls');
+            const overRunsEl = document.getElementById('this-over-runs');
+            const currentOverNumEl = document.getElementById('current-over-number');
+            if (!container || !overRunsEl || !currentOverNumEl) return;
 
-function updateLastOverDisplay() {
-    console.log("--- updateLastOverDisplay() called. ---");
-    console.log("Last over data:", gameState.lastOver);
-    // ... (rest of your last over display code)
-}
+            container.innerHTML = '';
+            let overRuns = 0;
+            let legalBallsInOver = 0;
+            
+            if (gameState.currentOver) {
+                gameState.currentOver.forEach(ball => {
+                    const ballDiv = document.createElement('div');
+                    ballDiv.className = 'ball';
+                    let text = ball.runs;
+                    overRuns += ball.runs;
+                    if (ball.legalDelivery) {
+                        legalBallsInOver++;
+                    }
+                    if (ball.type === 'extra') {
+                        let extraSymbol = '';
+                        if (ball.extraType === 'wide') { extraSymbol = 'WD'; } else if (ball.extraType === 'noball') { extraSymbol = 'NB'; }
+                        text = `${ball.runs}${extraSymbol}`;
+                        ballDiv.classList.add('extra');
+                    } else if (ball.type === 'wicket') {
+                        text = 'W';
+                        ballDiv.classList.add('wicket');
+                    } else if (ball.runs === 4) {
+                        ballDiv.classList.add('boundary');
+                    } else if (ball.runs === 6) {
+                        ballDiv.classList.add('six');
+                    } else if (ball.runs > 0) {
+                        ballDiv.classList.add(`runs-${ball.runs}`);
+                    }
+                    ballDiv.textContent = text;
+                    container.appendChild(ballDiv);
+                });
+            }
+            
+            const totalPendingBalls = 6 - legalBallsInOver;
+            for (let i = 0; i < totalPendingBalls; i++) {
+                const pendingBallDiv = document.createElement('div');
+                pendingBallDiv.className = 'ball pending';
+                container.appendChild(pendingBallDiv);
+            }
+            
+            overRunsEl.textContent = overRuns;
+            currentOverNumEl.textContent = gameState.teams[gameState.battingTeam] ? gameState.teams[gameState.battingTeam].overs + 1 : 1;
+        }
 
-function updateTargetDisplay() {
-    console.log("--- updateTargetDisplay() called. ---");
-    console.log("Target data:", gameState.target);
-    // ... (rest of your target display code)
-}
+        function updateLastOverDisplay() {
+            const display = document.getElementById('last-over-display');
+            if (!display) return;
+            if (gameState.lastOver && gameState.lastOver.length > 0) {
+                const extraSymbols = { 'wide': 'WD', 'noball': 'NB', 'bye': 'B', 'legbye': 'LB', 'overthrow': 'O', 'penalty': 'P' };
+                let overRuns = gameState.lastOver.reduce((acc, b) => acc + b.runs, 0);
+                display.textContent = gameState.lastOver.map(b => {
+                    if (b.type === 'wicket') { return 'W'; }
+                    if (b.extraType) {
+                        const symbol = extraSymbols[b.extraType] || b.extraType.toUpperCase();
+                        return `${b.runs}${symbol}`;
+                    }
+                    return b.runs;
+                }).join('  ') + `  (${overRuns} runs)`;
+            } else {
+                display.textContent = 'N/A';
+            }
+        }
+        
+        function updateTargetDisplay() {
+            const targetInfoDiv = document.getElementById('target-info');
+            const displayMessage = targetInfoDiv.querySelector('p');
+            if (!targetInfoDiv || !displayMessage) return;
 
+            if (gameState.matchOver && gameState.matchSummary) {
+                targetInfoDiv.style.display = 'block';
+                displayMessage.textContent = gameState.matchSummary;
+                return;
+            }
+
+            const isFirstInning = gameState.toss && gameState.currentInnings === gameState.toss.winner;
+            const currentBalls = gameState.teams[gameState.battingTeam] ? (gameState.teams[gameState.battingTeam].overs * 6) + gameState.teams[gameState.battingTeam].balls : 0;
+
+            if (gameState.matchStarted && isFirstInning && currentBalls <= 12) {
+                targetInfoDiv.style.display = 'block';
+                displayMessage.innerHTML = `${gameState.teams[gameState.toss.winner].name} won the toss and opted to ${gameState.toss.decision} first.`;
+            } else if (gameState.currentInnings === 2 && gameState.target !== null) {
+                const chasingTeam = gameState.teams[gameState.battingTeam];
+                if (chasingTeam) {
+                    targetInfoDiv.style.display = 'block';
+                    const runsNeeded = gameState.target - chasingTeam.score;
+                    const ballsRemaining = (gameState.totalOvers * 6) - ((chasingTeam.overs * 6) + chasingTeam.balls);
+                    displayMessage.innerHTML = `<span id="chasing-team-name">${chasingTeam.name}</span> needs <strong style="color:#a7ffeb; font-size:1.2em">${Math.max(0, runsNeeded)}</strong> runs from <strong style="color:#a7ffeb; font-size:1.2em">${Math.max(0, ballsRemaining)}</strong> balls to win.`;
+                }
+            } else {
+                targetInfoDiv.style.display = 'none';
+            }
+        }
 
         function showSummary() {
             const modal = document.getElementById('summary-modal');
