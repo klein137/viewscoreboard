@@ -457,10 +457,21 @@
             matchOver: false
         };
 
+        // Check if session login exists on load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem("isManagerLoggedIn") === "true") {
+                isManagerLoggedIn = true;
+                document.getElementById('login-screen').style.display = 'none';
+                document.querySelector('.app-container').style.display = 'block';
+                loadGameStateFromLocalStorage();
+            }
+        });
+
         function verifyManager() {
             const entered = document.getElementById('admin-password').value;
             if (entered === managerPassword) {
                 isManagerLoggedIn = true;
+                sessionStorage.setItem("isManagerLoggedIn", "true");
                 document.getElementById('login-screen').style.display = 'none';
                 document.querySelector('.app-container').style.display = 'block';
                 loadGameStateFromLocalStorage();
@@ -539,6 +550,7 @@
             updateBatsmanStats(2);
             updateBowlerStats(); 
             updateCurrentOverDisplay(); 
+            updateLastOverDisplay();
         }
 
         function updateTeamName(team) {
@@ -922,16 +934,47 @@
             }
         }
 
+        /* UPDATED: CALCULATES AND DISPLAYS RUNS IN CURRENT OVER */
         function updateCurrentOverDisplay() {
             const container = document.getElementById('current-over-balls');
             if (!container) return;
             container.innerHTML = '';
-            gameState.currentOver.forEach(ball => {
-                const div = document.createElement('div');
-                div.className = 'ball ' + (ball.type === 'wicket' ? 'wicket' : ball.runs === 4 ? 'boundary' : ball.runs === 6 ? 'six' : '');
-                div.textContent = ball.type === 'wicket' ? 'W' : ball.runs;
-                container.appendChild(div);
-            });
+
+            let overRuns = 0;
+            if (gameState.currentOver && gameState.currentOver.length > 0) {
+                gameState.currentOver.forEach(ball => {
+                    overRuns += (ball.runs || 0);
+                    const div = document.createElement('div');
+                    div.className = 'ball ' + (ball.type === 'wicket' ? 'wicket' : ball.runs === 4 ? 'boundary' : ball.runs === 6 ? 'six' : '');
+                    div.textContent = ball.type === 'wicket' ? 'W' : ball.runs;
+                    container.appendChild(div);
+                });
+            }
+
+            const overRunsEl = document.getElementById('this-over-runs');
+            if (overRunsEl) overRunsEl.textContent = overRuns;
+
+            const overNumEl = document.getElementById('current-over-number');
+            if (overNumEl && gameState.battingTeam && gameState.teams[gameState.battingTeam]) {
+                overNumEl.textContent = (gameState.teams[gameState.battingTeam].overs || 0) + 1;
+            }
+        }
+
+        /* UPDATED: DISPLAYS LAST OVER SUMMARY */
+        function updateLastOverDisplay() {
+            const display = document.getElementById('last-over-display');
+            if (!display) return;
+
+            if (gameState.lastOver && gameState.lastOver.length > 0) {
+                let lastRuns = 0;
+                const ballsText = gameState.lastOver.map(b => {
+                    lastRuns += (b.runs || 0);
+                    return b.type === 'wicket' ? 'W' : b.runs;
+                }).join(' ');
+                display.textContent = `${ballsText} (${lastRuns} runs)`;
+            } else {
+                display.textContent = 'N/A';
+            }
         }
 
         function switchInnings() {
@@ -945,6 +988,7 @@
         function resetMatch() {
             if (confirm("Reset all game data?")) {
                 localStorage.removeItem("liveGameState");
+                sessionStorage.removeItem("isManagerLoggedIn");
                 window.location.reload();
             }
         }
@@ -1010,7 +1054,6 @@
             summaryContent.innerHTML = html;
             document.getElementById('summaryModal').style.display = 'flex';
 
-            // Save to Match History
             saveMatchToHistory({
                 date: new Date().toLocaleString(),
                 teamA: `${tA.name}: ${tA.score}/${tA.wickets}`,
@@ -1039,7 +1082,7 @@
                     const div = document.createElement('div');
                     div.className = 'history-item';
                     div.innerHTML = `
-                        <div style="display:flex; justify-size:space-between; align-items:center;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <strong>Match ${idx+1} (${m.date})</strong>
                                 <div>${m.teamA} vs ${m.teamB}</div>
