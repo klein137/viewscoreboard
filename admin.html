@@ -667,6 +667,7 @@
             });
         }
 
+        /* UPDATED: DISPLAYS BOWLER OVERS RECORD IN DROPDOWN LIST */
         function updateBowlerSelect() {
             if (!gameState.bowlingTeam) return;
             const select = document.getElementById('bowler-select');
@@ -678,7 +679,16 @@
                 if (player !== gameState.lastBowler) {
                     const option = document.createElement('option');
                     option.value = player;
-                    option.textContent = player;
+
+                    const stats = gameState.bowlerStats[player];
+                    if (stats && stats.balls > 0) {
+                        const overs = Math.floor(stats.balls / 6);
+                        const remainingBalls = stats.balls % 6;
+                        option.textContent = `${player} (${overs}.${remainingBalls} over - ${stats.wickets}/${stats.runs})`;
+                    } else {
+                        option.textContent = `${player} (0 over)`;
+                    }
+
                     select.appendChild(option);
                 }
             });
@@ -934,7 +944,6 @@
             }
         }
 
-        /* UPDATED: CALCULATES AND DISPLAYS RUNS IN CURRENT OVER */
         function updateCurrentOverDisplay() {
             const container = document.getElementById('current-over-balls');
             if (!container) return;
@@ -960,7 +969,6 @@
             }
         }
 
-        /* UPDATED: DISPLAYS LAST OVER SUMMARY */
         function updateLastOverDisplay() {
             const display = document.getElementById('last-over-display');
             if (!display) return;
