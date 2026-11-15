@@ -616,7 +616,7 @@
             }
         }
 
-        /* UPDATED: SEQUENTIAL NUMBERING (1 to 11 for Playing XI, 12+ for Substitutes) */
+        /* UPDATED: SEQUENTIAL NUMBERING + EDIT & DELETE BUTTONS */
         function updatePlayersDisplay(team) {
             const list = document.getElementById(`players${team}-list`);
             const subsList = document.getElementById(`subs${team}-list`);
@@ -627,24 +627,124 @@
 
             const teamData = gameState.teams[team];
 
-            // Render Playing XI (1., 2., 3...)
+            // Render Playing XI
             teamData.players.forEach((player, idx) => {
                 const div = document.createElement('div');
                 div.className = 'player-item';
-                div.innerHTML = `<span><strong>${idx + 1}.</strong> ${player}</span>`;
+                div.innerHTML = `
+                    <span><strong>${idx + 1}.</strong> ${player}</span>
+                    <div style="display:flex; gap:4px;">
+                        <button onclick="editPlayer('${team}', ${idx})" class="action-btn" style="padding:2px 6px; font-size:0.75em; min-height:26px; background:#0277bd;">✏️</button>
+                        <button onclick="deletePlayer('${team}', ${idx})" class="action-btn" style="padding:2px 6px; font-size:0.75em; min-height:26px; background:var(--accent-red);">🗑️</button>
+                    </div>
+                `;
                 list.appendChild(div);
             });
 
-            // Render Substitutes (Starts from 12.)
+            // Render Substitutes
             if (subsList && teamData.substitutes) {
                 const startSubNum = Math.max(11, teamData.players.length);
                 teamData.substitutes.forEach((sub, sIdx) => {
                     const sDiv = document.createElement('div');
                     sDiv.className = 'player-item';
-                    sDiv.innerHTML = `<span><strong>${startSubNum + sIdx + 1}.</strong> ${sub} (Sub)</span>`;
+                    sDiv.innerHTML = `
+                        <span><strong>${startSubNum + sIdx + 1}.</strong> ${sub} (Sub)</span>
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="editSubstitute('${team}', ${sIdx})" class="action-btn" style="padding:2px 6px; font-size:0.75em; min-height:26px; background:#0277bd;">✏️</button>
+                            <button onclick="deleteSubstitute('${team}', ${sIdx})" class="action-btn" style="padding:2px 6px; font-size:0.75em; min-height:26px; background:var(--accent-red);">🗑️</button>
+                        </div>
+                    `;
                     subsList.appendChild(sDiv);
                 });
             }
+        }
+
+        /* EDIT AND DELETE PLAYER FUNCTIONS */
+        function editPlayer(team, idx) {
+            const teamData = gameState.teams[team];
+            const oldName = teamData.players[idx];
+            if (!oldName) return;
+
+            const newName = prompt("Edit player name:", oldName);
+            if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+
+            const trimmedNew = newName.trim();
+
+            teamData.players[idx] = trimmedNew;
+
+            if (gameState.playerStats[oldName]) {
+                gameState.playerStats[trimmedNew] = gameState.playerStats[oldName];
+                delete gameState.playerStats[oldName];
+            }
+            if (gameState.bowlerStats[oldName]) {
+                gameState.bowlerStats[trimmedNew] = gameState.bowlerStats[oldName];
+                delete gameState.bowlerStats[oldName];
+            }
+
+            if (gameState.currentBatsmen[1] === oldName) gameState.currentBatsmen[1] = trimmedNew;
+            if (gameState.currentBatsmen[2] === oldName) gameState.currentBatsmen[2] = trimmedNew;
+            if (gameState.currentBowler === oldName) gameState.currentBowler = trimmedNew;
+            if (gameState.lastBowler === oldName) gameState.lastBowler = trimmedNew;
+
+            if (teamData.outPlayers) {
+                const outIdx = teamData.outPlayers.indexOf(oldName);
+                if (outIdx !== -1) teamData.outPlayers[outIdx] = trimmedNew;
+            }
+
+            updateAllDisplay();
+            syncLiveScore();
+        }
+
+        function deletePlayer(team, idx) {
+            const teamData = gameState.teams[team];
+            const playerName = teamData.players[idx];
+            if (!playerName) return;
+
+            if (!confirm(`Delete player ${playerName}?`)) return;
+
+            teamData.players.splice(idx, 1);
+            delete gameState.playerStats[playerName];
+            delete gameState.bowlerStats[playerName];
+
+            if (gameState.currentBatsmen[1] === playerName) gameState.currentBatsmen[1] = null;
+            if (gameState.currentBatsmen[2] === playerName) gameState.currentBatsmen[2] = null;
+            if (gameState.currentBowler === playerName) gameState.currentBowler = null;
+            if (gameState.lastBowler === playerName) gameState.lastBowler = null;
+
+            if (teamData.outPlayers) {
+                const outIdx = teamData.outPlayers.indexOf(playerName);
+                if (outIdx !== -1) teamData.outPlayers.splice(outIdx, 1);
+            }
+
+            updateAllDisplay();
+            syncLiveScore();
+        }
+
+        function editSubstitute(team, idx) {
+            const teamData = gameState.teams[team];
+            if (!teamData.substitutes) return;
+            const oldName = teamData.substitutes[idx];
+            if (!oldName) return;
+
+            const newName = prompt("Edit substitute name:", oldName);
+            if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+
+            teamData.substitutes[idx] = newName.trim();
+            updateAllDisplay();
+            syncLiveScore();
+        }
+
+        function deleteSubstitute(team, idx) {
+            const teamData = gameState.teams[team];
+            if (!teamData.substitutes) return;
+            const subName = teamData.substitutes[idx];
+            if (!subName) return;
+
+            if (!confirm(`Delete substitute ${subName}?`)) return;
+
+            teamData.substitutes.splice(idx, 1);
+            updateAllDisplay();
+            syncLiveScore();
         }
 
         function updateBatsmanSelects() {
@@ -672,7 +772,6 @@
             });
         }
 
-        /* UPDATED: DISPLAYS BOWLER OVERS RECORD IN DROPDOWN LIST */
         function updateBowlerSelect() {
             if (!gameState.bowlingTeam) return;
             const select = document.getElementById('bowler-select');
@@ -949,7 +1048,6 @@
             }
         }
 
-        /* CALCULATES AND DISPLAYS RUNS IN CURRENT OVER */
         function updateCurrentOverDisplay() {
             const container = document.getElementById('current-over-balls');
             if (!container) return;
@@ -975,7 +1073,6 @@
             }
         }
 
-        /* DISPLAYS LAST OVER SUMMARY */
         function updateLastOverDisplay() {
             const display = document.getElementById('last-over-display');
             if (!display) return;
