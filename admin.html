@@ -26,7 +26,7 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0;
-        padding: 10px;
+        padding: 6px;
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -38,143 +38,112 @@
         max-width: 900px;
         background-color: var(--primary-color);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: 10px;
+        padding: 10px;
         position: relative;
         margin: 0 auto;
       }
 
-      .nav-tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-        width: 100%;
-      }
-
+      .nav-tabs { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; }
       .nav-tab-btn {
-        flex: 1;
-        padding: 12px 8px;
-        font-size: 0.95em;
-        font-weight: bold;
-        color: var(--text-color);
-        background: var(--secondary-color);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: center;
-        transition: background 0.2s, color 0.2s;
+        flex: 1; padding: 10px 4px; font-size: 0.9em; font-weight: bold;
+        color: var(--text-color); background: var(--secondary-color); border: 1px solid var(--border-color);
+        border-radius: 8px; cursor: pointer; text-align: center; transition: background 0.2s, color 0.2s;
       }
-
-      .nav-tab-btn.active-tab {
-        background: var(--accent-green);
-        color: #000;
-        border-color: var(--accent-green);
-      }
+      .nav-tab-btn.active-tab { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
 
       .page { width: 100%; display: none; }
       .page.active { display: block; }
 
-      .header { text-align: center; margin-bottom: 15px; }
-      h1 { font-size: 1.6em; color: var(--accent-green); margin: 0; }
-      h2, h3, h4 { color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-top: 15px; }
-      p { color: #b0b0b0; font-size: 0.85em; }
+      .header { text-align: center; margin-bottom: 8px; }
+      h1 { font-size: 1.3em; color: var(--accent-green); margin: 0; }
+      h2, h3, h4 { color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 3px; margin-top: 10px; font-size: 1em; }
+      p { color: #b0b0b0; font-size: 0.8em; }
 
       .match-info, .teams-setup, .scoreboard, .controls, .over-summary, .current-partnership, .bowling-info, .match-controls {
-        text-align: center;
-        background-color: var(--secondary-color);
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 12px;
+        text-align: center; background-color: var(--secondary-color); padding: 8px; border-radius: 8px; margin-bottom: 8px;
       }
 
-      .input-group { margin-bottom: 12px; text-align: left; }
-      label { display: block; margin-bottom: 4px; color: var(--text-color); font-weight: bold; font-size: 0.9em; }
+      .input-group { margin-bottom: 8px; text-align: left; }
+      label { display: block; margin-bottom: 2px; color: var(--text-color); font-weight: bold; font-size: 0.85em; }
 
       input[type="text"], input[type="number"], input[type="password"], select {
-        text-align: center;
-        width: 100%; 
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background-color: #2a2a2a;
-        color: var(--text-color);
-        outline: none;
+        text-align: center; width: 100%; padding: 8px; font-size: 15px;
+        border: 1px solid var(--border-color); border-radius: 6px; background-color: #2a2a2a; color: var(--text-color); outline: none;
       }
 
-      .teams-setup { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-      .players-list { min-height: 50px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 8px; margin-top: 8px; background-color: #2a2a2a; }
-      .player-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #3a3a3a; font-size: 0.9em; }
+      .teams-setup { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .players-list { min-height: 40px; max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; margin-top: 6px; background-color: #2a2a2a; }
+      .player-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #3a3a3a; font-size: 0.85em; }
 
-      .scoreboard { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
-      .vs-symbol { font-weight: bold; font-size: 1.3em; color: var(--accent-gold); }
-      .team-score { background-color: #111a2e; padding: 12px 8px; border-radius: 8px; border: 1px solid var(--border-color); }
-      .team-score .team-name { font-size: 1.1em; font-weight: bold; color: var(--accent-blue); margin-bottom: 4px; }
-      .score-display { font-size: 2.2em; font-weight: 700; color: var(--accent-green); }
+      /* ALWAYS HORIZONTAL SCOREBOARD */
+      .scoreboard { 
+        display: grid; 
+        grid-template-columns: 1fr auto 1fr; 
+        gap: 6px; 
+        align-items: center; 
+        padding: 8px 4px;
+      }
+      .vs-symbol { font-weight: bold; font-size: 1.1em; color: var(--accent-gold); padding: 0 2px; }
+      .team-score { background-color: #111a2e; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+      .team-score .team-name { font-size: 0.95em; font-weight: bold; color: var(--accent-blue); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .score-display { font-size: 1.7em; font-weight: 700; color: var(--accent-green); line-height: 1.1; }
+      .team-score .overs, .team-score div { font-size: 0.75em; color: #b0b0b0; }
 
-      .score-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+      .score-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
       .score-btn {
-        padding: 12px 6px; font-size: 0.9em; font-weight: bold; color: var(--text-color);
-        background-color: #3a3a3a; border: none; border-radius: 8px; cursor: pointer; min-height: 44px;
+        padding: 8px 2px; font-size: 0.85em; font-weight: bold; color: var(--text-color);
+        background-color: #3a3a3a; border: none; border-radius: 6px; cursor: pointer; min-height: 38px;
       }
       .score-btn:active { transform: scale(0.97); }
       .score-btn.wicket { background-color: var(--accent-red); }
       .score-btn.extra { background-color: #5a5a5a; }
 
-      .over-summary .current-over { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; justify-content: center; }
+      .over-summary .current-over { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; justify-content: center; }
       .over-summary .ball {
-        width: 32px; height: 32px; background-color: #2a2a2a; border-radius: 50%;
-        display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.85em; border: 1px solid var(--border-color);
+        width: 28px; height: 28px; background-color: #2a2a2a; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.8em; border: 1px solid var(--border-color);
       }
       .over-summary .ball.wicket { background-color: var(--accent-red); }
       .over-summary .ball.extra { background-color: #5a5a5a; }
       .over-summary .ball.boundary { background-color: #f39c12; color: #000; }
       .over-summary .ball.six { background-color: #c0392b; color: #fff; }
 
-      .action-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
-      .action-btn { padding: 10px 6px; font-size: 0.85em; font-weight: bold; color: var(--text-color); background: var(--accent-blue); border: none; border-radius: 10px; cursor: pointer; min-height: 42px; }
-      .match-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .action-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+      .action-btn { padding: 8px 4px; font-size: 0.8em; font-weight: bold; color: var(--text-color); background: var(--accent-blue); border: none; border-radius: 8px; cursor: pointer; min-height: 38px; }
+      .match-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-      .batsmen { display: flex; justify-content: space-between; gap: 10px; }
-      .batsman { background-color: #2a2a2a; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); width: 48%; }
-      .batsman.on-strike { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(46, 255, 163, 0.3); }
+      /* SIDE-BY-SIDE BATSMEN ON MOBILE */
+      .batsmen { display: flex; justify-content: space-between; gap: 6px; }
+      .batsman { background-color: #2a2a2a; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); width: 49%; }
+      .batsman-name { font-size: 0.85em; font-weight: bold; margin-top: 2px; }
+      .batsman-stats { display: flex; justify-content: space-around; font-size: 0.75em; margin-top: 4px; }
+      .batsman.on-strike { border-color: var(--accent-green); box-shadow: 0 0 6px rgba(46, 255, 163, 0.3); }
 
       .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; padding: 10px; }
       .modal.active { display: flex; }
-      .modal-content { background-color: var(--secondary-color); padding: 20px; border-radius: 12px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; position: relative; }
-      .close { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; }
+      .modal-content { background-color: var(--secondary-color); padding: 16px; border-radius: 10px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; position: relative; }
+      .close { color: #aaa; position: absolute; top: 8px; right: 12px; font-size: 24px; cursor: pointer; }
       .hidden { display: none !important; }
-      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 15px; }
-      .modal-box { background: white; color: black; padding: 20px; border-radius: 12px; text-align: center; max-width: 320px; width: 100%; }
-      .modal-buttons { margin-top: 15px; display: flex; justify-content: space-around; }
-      .btn-yes { background: #28a745; color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; }
-      .btn-no { background: #dc3545; color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; }
+      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 10px; }
+      .modal-box { background: white; color: black; padding: 16px; border-radius: 10px; text-align: center; max-width: 300px; width: 100%; }
+      .modal-buttons { margin-top: 12px; display: flex; justify-content: space-around; }
+      .btn-yes { background: #28a745; color: white; padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; }
+      .btn-no { background: #dc3545; color: white; padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; }
 
-      @media (max-width: 768px) {
-        body { padding: 5px; }
-        .app-container { padding: 10px; border-radius: 8px; }
-        .teams-setup { grid-template-columns: 1fr; gap: 15px; }
-        .batsmen { flex-direction: column; gap: 10px; }
-        .batsman { width: 100%; }
-        .score-buttons { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .score-btn { font-size: 0.8em; padding: 10px 4px; }
-        .action-buttons { grid-template-columns: 1fr; gap: 8px; }
-        .match-controls { grid-template-columns: 1fr; gap: 8px; }
-      }
-
-      @media (max-width: 480px) {
-        h1 { font-size: 1.3em; }
-        .scoreboard { grid-template-columns: 1fr; gap: 8px; }
-        .vs-symbol { margin: 2px 0; }
-        .score-display { font-size: 2em; }
-        .score-buttons { grid-template-columns: repeat(3, 1fr); }
+      @media (max-width: 600px) {
+        body { padding: 4px; }
+        .app-container { padding: 8px; }
+        .teams-setup { grid-template-columns: 1fr; gap: 10px; }
+        .score-buttons { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .score-btn { font-size: 0.8em; padding: 8px 2px; }
       }
     </style>
 </head>
 <body>
 
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" style="text-align: center; max-width: 400px; width:100%; margin: 60px auto; padding: 20px; background: var(--secondary-color); border-radius: 12px;">
+    <div id="login-screen" style="text-align: center; max-width: 380px; width:100%; margin: 40px auto; padding: 20px; background: var(--secondary-color); border-radius: 12px;">
         <h2>Manager / Admin Login</h2>
         <p>Enter your password to manage the live scorecard</p>
         <div class="input-group">
@@ -208,15 +177,22 @@
                         <input type="text" id="teamA-name" placeholder="Enter Team A name" onblur="updateTeamName('A')" oninput="updateTeamName('A')">
                     </div>
                     <div class="input-group">
-                        <label>Add Player:</label>
+                        <label>Add Playing XI Player:</label>
                         <div style="display:flex; gap:5px;">
                             <input type="text" id="playerA-input" placeholder="Player name">
-                            <button onclick="addPlayer('A')" class="action-btn" style="width: 80px;">Add</button>
+                            <button onclick="addPlayer('A')" class="action-btn" style="width: 70px;">Add</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Add Substitute Player:</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="subA-input" placeholder="Sub player name">
+                            <button onclick="addSubstitute('A')" class="action-btn" style="width: 70px; background: var(--accent-purple);">Add Sub</button>
                         </div>
                     </div>
                     <div class="players-list" id="playersA-list"></div>
-                    <h4 style="margin-top: 15px;">Yet to bat:</h4>
-                    <div class="players-list" id="playersA-yet-to-bat"></div>
+                    <h4 style="margin-top: 10px;">Substitutes Bench:</h4>
+                    <div class="players-list" id="subsA-list"></div>
                 </div>
 
                 <div class="team-input">
@@ -226,15 +202,22 @@
                         <input type="text" id="teamB-name" placeholder="Enter Team B name" onblur="updateTeamName('B')" oninput="updateTeamName('B')">
                     </div>
                     <div class="input-group">
-                        <label>Add Player:</label>
+                        <label>Add Playing XI Player:</label>
                         <div style="display:flex; gap:5px;">
                             <input type="text" id="playerB-input" placeholder="Player name">
-                            <button onclick="addPlayer('B')" class="action-btn" style="width: 80px;">Add</button>
+                            <button onclick="addPlayer('B')" class="action-btn" style="width: 70px;">Add</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Add Substitute Player:</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="subB-input" placeholder="Sub player name">
+                            <button onclick="addSubstitute('B')" class="action-btn" style="width: 70px; background: var(--accent-purple);">Add Sub</button>
                         </div>
                     </div>
                     <div class="players-list" id="playersB-list"></div>
-                    <h4 style="margin-top: 15px;">Yet to bat:</h4>
-                    <div class="players-list" id="playersB-yet-to-bat"></div>
+                    <h4 style="margin-top: 10px;">Substitutes Bench:</h4>
+                    <div class="players-list" id="subsB-list"></div>
                 </div>
             </div>
 
@@ -267,8 +250,6 @@
                 <button onclick="startMatch()" class="action-btn" style="background: linear-gradient(135deg, var(--accent-green), #28a745); color:#000;">Start Match</button>
                 <button onclick="switchInnings()" class="action-btn">Switch Innings</button>
                 <button onclick="resetMatch()" class="action-btn" style="background: linear-gradient(135deg, #c31432, var(--accent-red));">Reset Match</button>
-                <button id="end-match-btn" onclick="showMatchSummary()" class="action-btn">Match Summary</button>
-                <button id="match-history-btn" onclick="showHistoryPage()" class="action-btn">Match History</button>
             </div>
         </div>
 
@@ -276,9 +257,10 @@
         <div id="scoring-view" class="page">
             <div class="header">
                  <h1>🏏 Live Scoring Control</h1>
-                 <p id="current-date"></p> 
+                 <p id="current-date" style="margin:2px 0 0 0;"></p> 
             </div>
 
+            <!-- HORIZONTAL SCOREBOARD -->
             <div class="scoreboard">
                 <div class="team-score">
                     <div class="team-name" id="team1-name">Team A</div>
@@ -297,14 +279,11 @@
                 </div>
             </div>
 
-            <div id="target-info" style="display: none; text-align:center; padding: 10px; background-color: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 15px;">
-                <p style="margin:0;"><span id="chasing-team-name"></span> needs <strong style="color:var(--accent-green); font-size:1.2em" id="runs-needed">0</strong> runs from <strong style="color:var(--accent-green); font-size:1.2em" id="balls-remaining">0</strong> balls to win.</p>
-            </div>
-
+            <!-- CURRENT BOWLER -->
             <div class="bowling-info">
                 <h3>Current Bowler</h3>
                 <div class="input-group"><select id="bowler-select" onchange="updateBowler()"><option value="">Select Bowler</option></select></div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; text-align:center; font-size:0.9em;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; text-align:center; font-size:0.8em;">
                     <div class="stat"><div>Bowler</div><div id="bowler-name" style="font-weight:bold;">N/A</div></div>
                     <div class="stat"><div>Figures</div><div id="bowler-wickets">0/0</div></div>
                     <div class="stat"><div>Overs</div><div id="bowler-overs">0.0</div></div>
@@ -313,23 +292,25 @@
                 </div>
             </div>
 
+            <!-- CURRENT PARTNERSHIP -->
             <div class="current-partnership">
                 <h3>Current Partnership</h3>
                 <div class="batsmen">
                     <div class="batsman" id="batsman1-container">
-                        <div class="input-group"><select id="batsman1-select" onchange="updateBatsman(1)"><option value="">Select Batsman</option></select></div>
+                        <div class="input-group" style="margin-bottom:4px;"><select id="batsman1-select" onchange="updateBatsman(1)"><option value="">Select Batsman</option></select></div>
                         <div class="batsman-name" id="batsman1-name">Batsman 1</div>
-                        <div class="batsman-stats"><div class="stat"><div>Runs</div><div id="batsman1-runs">0</div></div><div class="stat"><div>Balls</div><div id="batsman1-balls">0</div></div><div class="stat"><div>SR</div><div id="batsman1-sr">0.00</div></div></div>
+                        <div class="batsman-stats"><div class="stat"><div>R</div><div id="batsman1-runs">0</div></div><div class="stat"><div>B</div><div id="batsman1-balls">0</div></div><div class="stat"><div>SR</div><div id="batsman1-sr">0.00</div></div></div>
                     </div>
                     <div class="batsman" id="batsman2-container">
-                        <div class="input-group"><select id="batsman2-select" onchange="updateBatsman(2)"><option value="">Select Batsman</option></select></div>
+                        <div class="input-group" style="margin-bottom:4px;"><select id="batsman2-select" onchange="updateBatsman(2)"><option value="">Select Batsman</option></select></div>
                         <div class="batsman-name" id="batsman2-name">Batsman 2</div>
-                        <div class="batsman-stats"><div class="stat"><div>Runs</div><div id="batsman2-runs">0</div></div><div class="stat"><div>Balls</div><div id="batsman2-balls">0</div></div><div class="stat"><div>SR</div><div id="batsman2-sr">0.00</div></div></div>
+                        <div class="batsman-stats"><div class="stat"><div>R</div><div id="batsman2-runs">0</div></div><div class="stat"><div>B</div><div id="batsman2-balls">0</div></div><div class="stat"><div>SR</div><div id="batsman2-sr">0.00</div></div></div>
                     </div>
                 </div>
-                <div style="margin-top: 10px; text-align:center; font-size: 0.9em;"><strong>Last Wicket: <span id="last-wicket-info">N/A</span></strong></div>
+                <div style="margin-top: 6px; text-align:center; font-size: 0.8em;"><strong>Last Wicket: <span id="last-wicket-info">N/A</span></strong></div>
             </div>
 
+            <!-- SCORE BUTTONS -->
             <div class="controls">
                 <div class="score-buttons">
                     <button class="score-btn" onclick="addRuns(0)">0</button>
@@ -356,9 +337,9 @@
             </div>
 
             <div class="over-summary">
-                <div>Current Over: <span id="current-over-number">1</span> (<span id="this-over-runs">0</span> runs)</div>
+                <div style="font-size:0.85em;">Current Over: <span id="current-over-number">1</span> (<span id="this-over-runs">0</span> runs)</div>
                 <div class="current-over" id="current-over-balls"></div>
-                <div style="margin-top: 10px; font-size: 0.9em;"><strong>Last Over: <span id="last-over-display">N/A</span></strong></div>
+                <div style="margin-top: 6px; font-size: 0.8em;"><strong>Last Over: <span id="last-over-display">N/A</span></strong></div>
             </div>
         </div>
 
@@ -386,31 +367,6 @@
       </div>
     </div>
 
-    <div id="summaryModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('summaryModal')">&times;</span>
-            <h2>Match Summary</h2>
-            <div id="summary-content"></div>
-            <button onclick="downloadPDF()" class="action-btn" style="width:100%; margin-top: 15px;">📄 Download PDF</button>
-        </div>
-    </div>  
-
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('historyModal')">&times;</span>
-            <h2>Match History</h2>
-            <div id="match-history-container"></div>
-        </div>
-    </div>
-
-    <div id="historySummaryModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('historySummaryModal')">&times;</span>
-            <h2>Match History Summary</h2>
-            <div id="history-summary-content"></div>
-        </div>
-    </div>
-
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
@@ -433,8 +389,8 @@
 
         let gameState = {
             teams: {
-                A: { name: 'Team A', players: [], score: 0, wickets: 0, overs: 0, balls: 0, outPlayers: [] },
-                B: { name: 'Team B', players: [], score: 0, wickets: 0, overs: 0, balls: 0, outPlayers: [] }
+                A: { name: 'Team A', players: [], substitutes: [], score: 0, wickets: 0, overs: 0, balls: 0, outPlayers: [] },
+                B: { name: 'Team B', players: [], substitutes: [], score: 0, wickets: 0, overs: 0, balls: 0, outPlayers: [] }
             },
             currentInnings: null,
             battingTeam: null,
@@ -593,42 +549,42 @@
             }
         }
 
+        function addSubstitute(team) {
+            const input = document.getElementById(`sub${team}-input`);
+            const subName = input.value.trim();
+            if (subName) {
+                if (!gameState.teams[team].substitutes) gameState.teams[team].substitutes = [];
+                gameState.teams[team].substitutes.push(subName);
+                input.value = '';
+                updateAllDisplay();
+                syncLiveScore();
+            }
+        }
+
         function updatePlayersDisplay(team) {
             const list = document.getElementById(`players${team}-list`);
-            const yetToBatList = document.getElementById(`players${team}-yet-to-bat`);
-            if (!list || !yetToBatList) return;
+            const subsList = document.getElementById(`subs${team}-list`);
+            if (!list) return;
 
             list.innerHTML = '';
-            yetToBatList.innerHTML = '';
+            if (subsList) subsList.innerHTML = '';
 
-            const battingTeamData = gameState.teams[team];
-            const outPlayers = battingTeamData.outPlayers || [];
-            const currentBatsmenNames = [gameState.currentBatsmen[1], gameState.currentBatsmen[2]].filter(Boolean);
-
-            battingTeamData.players.forEach(player => {
+            const teamData = gameState.teams[team];
+            teamData.players.forEach(player => {
                 const div = document.createElement('div');
                 div.className = 'player-item';
-                const isCurrentlyBattingTeam = (team === gameState.battingTeam);
-
-                if (outPlayers.includes(player)) {
-                    div.innerHTML = `<span>${player} (OUT)</span>`;
-                    list.appendChild(div);
-                } else if (currentBatsmenNames.includes(player) && isCurrentlyBattingTeam) {
-                    const stats = gameState.playerStats[player] || { runs: 0, balls: 0 };
-                    div.innerHTML = `<span>${player} <b>${stats.runs}</b> (${stats.balls})</span>`;
-                    list.appendChild(div);
-                } else {
-                    if (isCurrentlyBattingTeam) {
-                        const yDiv = document.createElement('div');
-                        yDiv.className = 'player-item';
-                        yDiv.innerHTML = `<span>${player}</span>`;
-                        yetToBatList.appendChild(yDiv);
-                    } else {
-                        div.innerHTML = `<span>${player}</span>`;
-                        list.appendChild(div);
-                    }
-                }
+                div.innerHTML = `<span>${player}</span>`;
+                list.appendChild(div);
             });
+
+            if (subsList && teamData.substitutes) {
+                teamData.substitutes.forEach(sub => {
+                    const sDiv = document.createElement('div');
+                    sDiv.className = 'player-item';
+                    sDiv.innerHTML = `<span>${sub} (Sub)</span>`;
+                    subsList.appendChild(sDiv);
+                });
+            }
         }
 
         function updateBatsmanSelects() {
@@ -795,6 +751,7 @@
                 gameState.bowlerStats[gameState.currentBowler].balls++;
             }
             gameState.teams[gameState.battingTeam].balls++;
+            if (!gameState.teams[gameState.battingTeam].outPlayers) gameState.teams[gameState.battingTeam].outPlayers = [];
             gameState.teams[gameState.battingTeam].outPlayers.push(outName);
             gameState.currentBatsmen[outNum] = null;
             gameState.currentOver.push(ball);
@@ -835,7 +792,6 @@
             syncLiveScore();
         }
 
-        // FULLY FIXED UNDO FUNCTION
         function undoLastBall() {
             if (!gameState.ballHistory || gameState.ballHistory.length === 0) {
                 alert('No balls to undo!');
@@ -847,13 +803,11 @@
             const onStrikeBatsman = last.onStrikeBatsman;
             const bowlerName = last.bowler;
 
-            // 1. Revert Team Score & Balls
             bTeam.score = Math.max(0, bTeam.score - last.runs);
             if (last.legalDelivery) {
                 bTeam.balls = Math.max(0, bTeam.balls - 1);
             }
 
-            // 2. Revert Batsman Stats
             if (onStrikeBatsman && gameState.playerStats[onStrikeBatsman]) {
                 const bStats = gameState.playerStats[onStrikeBatsman];
                 if (last.type === 'runs') {
@@ -866,7 +820,6 @@
                 }
             }
 
-            // 3. Revert Bowler Stats
             if (bowlerName && gameState.bowlerStats[bowlerName]) {
                 const bwStats = gameState.bowlerStats[bowlerName];
                 bwStats.runs = Math.max(0, bwStats.runs - last.runs);
@@ -878,10 +831,9 @@
                 }
             }
 
-            // 4. Revert Wicket (if applicable)
             if (last.type === 'wicket') {
                 bTeam.wickets = Math.max(0, bTeam.wickets - 1);
-                if (last.outBatsman) {
+                if (last.outBatsman && bTeam.outPlayers) {
                     const idx = bTeam.outPlayers.indexOf(last.outBatsman);
                     if (idx !== -1) bTeam.outPlayers.splice(idx, 1);
                     if (last.onStrike) {
@@ -890,12 +842,10 @@
                 }
             }
 
-            // 5. Restore On-Strike Batsman Position
             if (last.onStrike) {
                 gameState.onStrike = last.onStrike;
             }
 
-            // 6. Revert Over Boundary Transition
             if (gameState.currentOver.length === 0 && gameState.lastOver && gameState.lastOver.length > 0) {
                 gameState.currentOver = [...gameState.lastOver];
                 gameState.lastOver = null;
@@ -904,10 +854,8 @@
                 gameState.currentBowler = bowlerName;
             }
 
-            // Remove ball from current over tracker
             gameState.currentOver.pop();
 
-            // Refresh UI and sync with Firebase/LocalStorage
             updateAllDisplay();
             syncLiveScore();
         }
@@ -959,8 +907,6 @@
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function showMatchSummary() { document.getElementById('summaryModal').style.display = 'flex'; }
-        function showHistoryPage() { document.getElementById('historyModal').style.display = 'flex'; }
     </script>
 </body>
 </html>
