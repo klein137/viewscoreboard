@@ -111,7 +111,7 @@
 
       .action-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
       .action-btn { padding: 8px 4px; font-size: 0.8em; font-weight: bold; color: var(--text-color); background: var(--accent-blue); border: none; border-radius: 8px; cursor: pointer; min-height: 38px; }
-      .match-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .match-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
 
       /* SIDE-BY-SIDE BATSMEN ON MOBILE */
       .batsmen { display: flex; justify-content: space-between; gap: 6px; }
@@ -120,9 +120,10 @@
       .batsman-stats { display: flex; justify-content: space-around; font-size: 0.75em; margin-top: 4px; }
       .batsman.on-strike { border-color: var(--accent-green); box-shadow: 0 0 6px rgba(46, 255, 163, 0.3); }
 
+      /* Modals */
       .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; padding: 10px; }
       .modal.active { display: flex; }
-      .modal-content { background-color: var(--secondary-color); padding: 16px; border-radius: 10px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; position: relative; }
+      .modal-content { background-color: var(--secondary-color); padding: 16px; border-radius: 10px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; position: relative; }
       .close { color: #aaa; position: absolute; top: 8px; right: 12px; font-size: 24px; cursor: pointer; }
       .hidden { display: none !important; }
       .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 10px; }
@@ -130,6 +131,15 @@
       .modal-buttons { margin-top: 12px; display: flex; justify-content: space-around; }
       .btn-yes { background: #28a745; color: white; padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; }
       .btn-no { background: #dc3545; color: white; padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; }
+
+      .history-item {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        font-size: 0.85em;
+      }
 
       @media (max-width: 600px) {
         body { padding: 4px; }
@@ -246,9 +256,12 @@
                 </div>
             </div>
 
+            <!-- MATCH CONTROLS WITH SUMMARY AND HISTORY -->
             <div class="match-controls">
                 <button onclick="startMatch()" class="action-btn" style="background: linear-gradient(135deg, var(--accent-green), #28a745); color:#000;">Start Match</button>
                 <button onclick="switchInnings()" class="action-btn">Switch Innings</button>
+                <button onclick="showMatchSummary()" class="action-btn" style="background: #0277bd;">Match Summary</button>
+                <button onclick="showHistoryPage()" class="action-btn" style="background: var(--accent-purple);">Match History</button>
                 <button onclick="resetMatch()" class="action-btn" style="background: linear-gradient(135deg, #c31432, var(--accent-red));">Reset Match</button>
             </div>
         </div>
@@ -367,9 +380,39 @@
       </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- SUMMARY MODAL -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('summaryModal')">&times;</span>
+            <h2>Match Summary</h2>
+            <div id="summary-content" style="font-size:0.9em;"></div>
+            <button onclick="downloadPDF()" class="action-btn" style="width:100%; margin-top: 15px; background: #28a745;">📄 Download PDF</button>
+        </div>
+    </div>  
+
+    <!-- HISTORY MODAL -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('historyModal')">&times;</span>
+            <h2>Match History</h2>
+            <div id="match-history-container"></div>
+        </div>
+    </div>
+
+    <!-- HISTORY SUMMARY MODAL -->
+    <div id="historySummaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('historySummaryModal')">&times;</span>
+            <h2>Match History Summary</h2>
+            <div id="history-summary-content" style="font-size:0.9em;"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs & PDF Generation SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
         const managerPassword = "9612";
@@ -907,6 +950,147 @@
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        /* MATCH SUMMARY & PDF DOWNLOAD LOGIC */
+        function showMatchSummary() {
+            const summaryContent = document.getElementById('summary-content');
+            if (!summaryContent) return;
+
+            const tA = gameState.teams.A;
+            const tB = gameState.teams.B;
+
+            let resultString = "In Progress";
+            if (gameState.matchOver) {
+                if (tA.score > tB.score) resultString = `${tA.name} won by ${tA.score - tB.score} runs!`;
+                else if (tB.score > tA.score) resultString = `${tB.name} won by ${tB.players.length - 1 - tB.wickets} wickets!`;
+                else resultString = "Match Tied!";
+            } else if (gameState.toss && gameState.toss.winner) {
+                resultString = `${gameState.teams[gameState.toss.winner]?.name} won toss & opted to ${gameState.toss.decision}`;
+            }
+
+            let html = `<h3>🏆 Match Result: ${resultString}</h3><hr style="margin:8px 0; border:none; border-top:1px solid var(--border-color);">`;
+
+            ['A', 'B'].forEach(key => {
+                const team = gameState.teams[key];
+                const oppKey = key === 'A' ? 'B' : 'A';
+                const opp = gameState.teams[oppKey];
+
+                html += `<h4 style="color:var(--accent-green); margin-top:12px;">${team.name} Innings: ${team.score}/${team.wickets} (${team.overs}.${team.balls} Ov)</h4>`;
+                
+                // Batting Table
+                html += `<table style="width:100%; border-collapse:collapse; font-size:0.85em; margin-top:4px;">
+                    <tr style="background:#111a2e; text-align:left;">
+                        <th style="padding:4px;">Batter</th><th style="padding:4px;">R</th><th style="padding:4px;">B</th><th style="padding:4px;">4s</th><th style="padding:4px;">6s</th>
+                    </tr>`;
+                
+                (team.players || []).forEach(p => {
+                    const s = gameState.playerStats[p] || { runs: 0, balls: 0, fours: 0, sixes: 0 };
+                    html += `<tr style="border-bottom:1px solid #333;">
+                        <td style="padding:4px;">${p}</td><td>${s.runs}</td><td>${s.balls}</td><td>${s.fours || 0}</td><td>${s.sixes || 0}</td>
+                    </tr>`;
+                });
+                html += `</table>`;
+
+                // Bowling Table
+                html += `<h4 style="color:var(--accent-blue); margin-top:10px;">${opp.name} Bowling</h4>`;
+                html += `<table style="width:100%; border-collapse:collapse; font-size:0.85em; margin-top:4px;">
+                    <tr style="background:#111a2e; text-align:left;">
+                        <th style="padding:4px;">Bowler</th><th style="padding:4px;">O</th><th style="padding:4px;">R</th><th style="padding:4px;">W</th>
+                    </tr>`;
+
+                Object.keys(gameState.bowlerStats || {}).filter(b => gameState.playerStats[b] && gameState.playerStats[b].team === oppKey).forEach(b => {
+                    const s = gameState.bowlerStats[b];
+                    html += `<tr style="border-bottom:1px solid #333;">
+                        <td style="padding:4px;">${b}</td><td>${Math.floor(s.balls/6)}.${s.balls%6}</td><td>${s.runs}</td><td>${s.wickets}</td>
+                    </tr>`;
+                });
+                html += `</table>`;
+            });
+
+            summaryContent.innerHTML = html;
+            document.getElementById('summaryModal').style.display = 'flex';
+
+            // Save to Match History
+            saveMatchToHistory({
+                date: new Date().toLocaleString(),
+                teamA: `${tA.name}: ${tA.score}/${tA.wickets}`,
+                teamB: `${tB.name}: ${tB.score}/${tB.wickets}`,
+                result: resultString,
+                fullSummary: html
+            });
+        }
+
+        function saveMatchToHistory(matchData) {
+            let history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+            history.push(matchData);
+            localStorage.setItem("matchHistory", JSON.stringify(history));
+        }
+
+        function showHistoryPage() {
+            const container = document.getElementById('match-history-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+            if (history.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">No saved match history found.</p>';
+            } else {
+                history.forEach((m, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `
+                        <div style="display:flex; justify-size:space-between; align-items:center;">
+                            <div>
+                                <strong>Match ${idx+1} (${m.date})</strong>
+                                <div>${m.teamA} vs ${m.teamB}</div>
+                                <div style="color:var(--accent-gold);">${m.result}</div>
+                            </div>
+                            <div style="display:flex; gap:5px; margin-top:6px;">
+                                <button onclick="openHistorySummaryModal(${idx})" class="action-btn" style="padding:4px 8px; font-size:0.75em;">View</button>
+                                <button onclick="deleteMatchFromHistory(${idx})" class="action-btn" style="padding:4px 8px; font-size:0.75em; background:var(--accent-red);">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function openHistorySummaryModal(idx) {
+            let history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+            const match = history[idx];
+            if (!match) return;
+            document.getElementById('history-summary-content').innerHTML = match.fullSummary || `<p>${match.result}</p>`;
+            document.getElementById('historySummaryModal').style.display = 'flex';
+        }
+
+        function deleteMatchFromHistory(idx) {
+            if (confirm("Delete this match record from history?")) {
+                let history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+                history.splice(idx, 1);
+                localStorage.setItem("matchHistory", JSON.stringify(history));
+                showHistoryPage();
+            }
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const content = document.getElementById("summary-content");
+            if (!content) return;
+
+            try {
+                const canvas = await html2canvas(content, { scale: 2, backgroundColor: "#162447" });
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Cricket_Match_Summary_${Date.now()}.pdf`);
+            } catch (err) {
+                alert("Failed to download PDF. Please try again.");
+            }
+        }
     </script>
 </body>
 </html>
