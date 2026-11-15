@@ -73,7 +73,7 @@
       }
 
       .teams-setup { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      .players-list { min-height: 40px; max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; margin-top: 6px; background-color: #2a2a2a; }
+      .players-list { min-height: 40px; max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; margin-top: 6px; background-color: #2a2a2a; }
       .player-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #3a3a3a; font-size: 0.85em; }
 
       /* ALWAYS HORIZONTAL SCOREBOARD */
@@ -256,7 +256,7 @@
                 </div>
             </div>
 
-            <!-- MATCH CONTROLS WITH SUMMARY AND HISTORY -->
+            <!-- MATCH CONTROLS -->
             <div class="match-controls">
                 <button onclick="startMatch()" class="action-btn" style="background: linear-gradient(135deg, var(--accent-green), #28a745); color:#000;">Start Match</button>
                 <button onclick="switchInnings()" class="action-btn">Switch Innings</button>
@@ -616,6 +616,7 @@
             }
         }
 
+        /* UPDATED: SEQUENTIAL NUMBERING (1 to 11 for Playing XI, 12+ for Substitutes) */
         function updatePlayersDisplay(team) {
             const list = document.getElementById(`players${team}-list`);
             const subsList = document.getElementById(`subs${team}-list`);
@@ -625,18 +626,22 @@
             if (subsList) subsList.innerHTML = '';
 
             const teamData = gameState.teams[team];
-            teamData.players.forEach(player => {
+
+            // Render Playing XI (1., 2., 3...)
+            teamData.players.forEach((player, idx) => {
                 const div = document.createElement('div');
                 div.className = 'player-item';
-                div.innerHTML = `<span>${player}</span>`;
+                div.innerHTML = `<span><strong>${idx + 1}.</strong> ${player}</span>`;
                 list.appendChild(div);
             });
 
+            // Render Substitutes (Starts from 12.)
             if (subsList && teamData.substitutes) {
-                teamData.substitutes.forEach(sub => {
+                const startSubNum = Math.max(11, teamData.players.length);
+                teamData.substitutes.forEach((sub, sIdx) => {
                     const sDiv = document.createElement('div');
                     sDiv.className = 'player-item';
-                    sDiv.innerHTML = `<span>${sub} (Sub)</span>`;
+                    sDiv.innerHTML = `<span><strong>${startSubNum + sIdx + 1}.</strong> ${sub} (Sub)</span>`;
                     subsList.appendChild(sDiv);
                 });
             }
@@ -944,6 +949,7 @@
             }
         }
 
+        /* CALCULATES AND DISPLAYS RUNS IN CURRENT OVER */
         function updateCurrentOverDisplay() {
             const container = document.getElementById('current-over-balls');
             if (!container) return;
@@ -969,6 +975,7 @@
             }
         }
 
+        /* DISPLAYS LAST OVER SUMMARY */
         function updateLastOverDisplay() {
             const display = document.getElementById('last-over-display');
             if (!display) return;
